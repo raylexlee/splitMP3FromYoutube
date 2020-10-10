@@ -1,0 +1,22 @@
+{
+  "name": "splitMP3fromYoutube",
+  "version": "1.0.0",
+  "description": "A desktop app to  extract mp3 of youtube mp3 collection with youtube-dl",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [
+    "mp3",
+    "youtube",
+    "electron"
+  ],
+  "author": "Raylex Lee",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^8.5.2"
+  },
+  "dependencies": {
+    "xlsx": "^0.16.8"
+  }
+}
