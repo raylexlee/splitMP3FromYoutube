@@ -48,22 +48,24 @@
         <form class="myForm" name="ipcForm" onSubmit="JavaScript:sendForm(event)">
             
             <label for="link">Link:</label>
-            <input type="text" name="link" id="link">
+            <input type="text" name="link" id="link" value="">
 
             <label for="album">Album:</label>
-            <input type="text" name="album" id="album">
+            <input type="text" name="album" id="album" value="">
 
             <label for="singer">Singer:</label>
-            <input type="text" name="singer" id="singer">
+            <input type="text" name="singer" id="singer" value="">
 
             <label for="regex">Regex:</label>
-            <input type="text" name="regex" id="regex">
+            <input type="text" name="regex" id="regex" value="">
 
             <label for="timetitle">Time &amp; Title:</label>
-            <textarea name="timetitle" id="timetitle" cols="70" rows="15"></textarea><br><br>
+            <textarea name="timetitle" id="timetitle" cols="70" rows="15" value=""></textarea><br><br>
 
             <input type="submit" value="Submit">
             <input type="reset" value="Reset">
+            <input type="button" value="Get Last Album" onclick="JavaScript:requestLastAlbum()">
+            <textarea name="bashscript" id="bashscript" cols="70" rows="4" value=""></textarea><br><br>
         </form>
 
         <script src='./renderFile.js'></script>

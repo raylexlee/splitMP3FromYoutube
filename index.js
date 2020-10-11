@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, globalShortcut } = require('electron');
 const path = require ('path');
 const fs = require('fs');
 const Songs = require('./lib/getSongs.js')();
@@ -37,6 +37,12 @@ ipcMain.on('form-submission', function (event, Album) {
     fs.writeFileSync(songsJSONpath, JSON.stringify(Songs));
 //    console.log("Album Object", Album)
 });
+
+ipcMain.on('request-last-album', (event, arg) => {
+//  console.log(arg) 
+//  console.log(Songs.albums[Songs.albums.length-1])
+  event.reply('last-album-sent', Songs.albums[Songs.albums.length-1])
+})
 
 app.on('ready', function(){
     createWindow();
