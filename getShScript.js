@@ -1,4 +1,7 @@
-module.exports = album => {
+module.exports = arg => {
+    const link = `https://www.youtube.com/watch?v=${arg.link}`;
+    const album = arg.albumObj;
+    const filename = album.linktitle
     const pattern = new RegExp(album.regex);
     const TimeTitles = album.timetitles.map(timetitle => {
         const r = pattern.exec(timetitle);
@@ -24,7 +27,7 @@ module.exports = album => {
     const TimeArg = `${Times.join(" ")} EOF`;
     const TitleArg = Titles.join('');
     return `mkdir ~/NewMusic/${artist}
-youtube-dl --extract-audio --audio-format mp3 --audio-quality 5 -o 'album.%(ext)s' ${album.link}
+youtube-dl --extract-audio --audio-format mp3 --audio-quality 5 -o 'album.%(ext)s' ${link}
 mp3splt -o @a-@t -d ~/NewMusic/${artist} -g ${TitleArg} album.mp3 ${TimeArg}
 rm album.mp3
 `;

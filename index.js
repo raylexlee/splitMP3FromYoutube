@@ -1,10 +1,14 @@
+#!/usr/bin/env node
 const { app, BrowserWindow, ipcMain, globalShortcut } = require('electron');
+const { exec } = require('child_process');
+const get_mp3 = (_path, _link) => `cd ${_path}; ~/dd ${_link}`;
 const path = require ('path');
 const fs = require('fs');
-const Songs = require('./lib/getSongs.js')();
-const songsJSONpath = './songs.json';
+const Album = require('./lib/getAlbum.js')();
+const albumJSONpath = './album.json';
+const collectionPath = '/media/raylex/data/DownloadFromYoutube/collection';
 
-let window;
+let window, wintube  
 
 function createWindow(){
     window = new BrowserWindow({
@@ -23,7 +27,7 @@ function createWindow(){
         window.show();
     });
 
-    window.webContents.openDevTools();
+//    window.webContents.openDevTools();
 
     let contents = window.webContents;
 
@@ -32,18 +36,49 @@ function createWindow(){
     });
 }
 
-ipcMain.on('form-submission', function (event, Album) {
-    Songs.albums.push(Album);
-    fs.writeFileSync(songsJSONpath, JSON.stringify(Songs));
+function createWintube() { 
+  const url =  `https://www.youtube.com`
+  wintube = new BrowserWindow({width: 1280, height: 700, title: url}) 
+  wintube.loadURL(url) 
+//  wintube.webContents.openDevTools()
+}  
+
+app.whenReady().then(() => {
+  globalShortcut.register('CommandOrControl+X', () => {
+  //  console.log('CommandOrControl+X is pressed')
+    let currentURL = wintube.webContents.getURL();
+    exec(get_mp3(collectionPath, currentURL),
+        (error, stdout, stderr) => {
+            console.log(stdout);
+            console.log(stderr);
+            if (error !== null) {
+                console.log(`exec error: ${error}`);
+            }
+        });
+  })
+})
+ipcMain.on('form-submission', function (event, arg) {
+    Album[arg.link] = arg.albumObj;
+    fs.writeFileSync(albumJSONpath, JSON.stringify(Album));
 //    console.log("Album Object", Album)
 });
 
-ipcMain.on('request-last-album', (event, arg) => {
-//  console.log(arg) 
-//  console.log(Songs.albums[Songs.albums.length-1])
-  event.reply('last-album-sent', Songs.albums[Songs.albums.length-1])
-})
+ipcMain.on('request-album', (event, link) => {
+  event.reply('album-sent', 
+    ( link && (link in Album) ) 
+      ? {link: link, albumObj: Album[link]} 
+      : {link: link, albumObj: {}})
+    });
+
+ipcMain.on('request-link-title', (event, req) => {
+   const url = wintube.getURL();
+   const r = url.match(/v=(.*)$/);
+   const link = r ? r[1] : '';
+   const linktitle = r ? wintube.getTitle() : '';
+   event.reply('link-title-sent', {link: link, linktitle: linktitle});
+});
 
 app.on('ready', function(){
     createWindow();
+    createWintube();
 });
