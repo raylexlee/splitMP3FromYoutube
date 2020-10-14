@@ -7,6 +7,8 @@ module.exports = arg => {
         const rArray = pattern.exec(timetitle);
         const r = rArray ? rArray : [];
         let Time, Title;
+        r[1] = r[1] ? r[1] : '0';
+        r[2] = r[2] ? r[2] : '0';
         if (/^\d/.test(r[1])) {
             Title = r[r.length-1];
             Time = (r.length === 5) 
