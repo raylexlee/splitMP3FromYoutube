@@ -19,11 +19,11 @@ module.exports = arg => {
                 : `${r[2]}.${r[3]}`;
         }
         TitleStr = Title ? Title : '';
-        return {Time: Time, Title: TitleStr.replace(/\s/g, '\\ ')};
+        return {Time: Time, Title: TitleStr.replace(/[\]\['\s()]/g, '\\$&')};
     });
     const Times = TimeTitles.map(e => e.Time);
-    const artist = album.singer.replace(/\s/g, '\\ ');
-    const alBum = album.album.replace(/\s/g, '\\ ');
+    const artist = album.singer.replace(/[\]\['\s()]/g, '\\$&');
+    const alBum = album.album.replace(/[\]\['\s()]/g, '\\$&');
     const Titles = TimeTitles.map( (e, idx) => 
         (idx === 0 )  ? `%[@a=${artist},@b=${alBum},@t=${e.Title},@g=13]` : `[@t=${e.Title}]`);
     const TimeArg = `${Times.join(" ")} EOF`;
