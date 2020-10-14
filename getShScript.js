@@ -4,7 +4,8 @@ module.exports = arg => {
     const filename = album.linktitle
     const pattern = new RegExp(album.regex);
     const TimeTitles = album.timetitles.map(timetitle => {
-        const r = pattern.exec(timetitle);
+        const rArray = pattern.exec(timetitle);
+        const r = rArray ? rArray : [];
         let Time, Title;
         if (/^\d/.test(r[1])) {
             Title = r[r.length-1];
@@ -17,11 +18,12 @@ module.exports = arg => {
                 ? `${60*(r[2].replace(/:$/,'')) + 1*r[3]}.${r[4]}`
                 : `${r[2]}.${r[3]}`;
         }
-        return {Time: Time, Title: Title.replace(/\s/g, '+')};
+        TitleStr = Title ? Title : '';
+        return {Time: Time, Title: TitleStr.replace(/\s/g, '\\ ')};
     });
     const Times = TimeTitles.map(e => e.Time);
     const artist = album.singer.replace(/\s/g, '\\ ');
-    const alBum = album.album.replace(/\s/g, '+');
+    const alBum = album.album.replace(/\s/g, '\\ ');
     const Titles = TimeTitles.map( (e, idx) => 
         (idx === 0 )  ? `%[@a=${artist},@b=${alBum},@t=${e.Title},@g=13]` : `[@t=${e.Title}]`);
     const TimeArg = `${Times.join(" ")} EOF`;
