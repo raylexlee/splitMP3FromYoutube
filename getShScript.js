@@ -1,7 +1,10 @@
+const { fstat } = require("fs");
+
 module.exports = arg => {
     const link = `https://www.youtube.com/watch?v=${arg.link}`;
     const album = arg.albumObj;
     const filename = album.linktitle
+    const collectionPath = '/media/raylex/data/DownloadFromYoutube/collection';
     const pattern = new RegExp(album.regex);
     const TimeTitles = album.timetitles.map(timetitle => {
         const rArray = pattern.exec(timetitle);
@@ -30,9 +33,15 @@ module.exports = arg => {
         (idx === 0 )  ? `%[@a=${artist},@b=${alBum},@t=${e.Title},@g=13]` : `[@t=${e.Title}]`);
     const TimeArg = `${Times.join(" ")} EOF`;
     const TitleArg = Titles.join('');
-    return `mkdir ~/NewMusic/${artist}
+    const AlbumCollectionPath = `${collectionPath}/${filename}.mp3`;
+    if (fs.existsSync(AlbumCollectionPath)) {
+        return `mkdir ~/NewMusic/${artist}
+mp3splt -o @a-@t -d ~/NewMusic/${artist} -g ${TitleArg} ${AlbumCollectionPath.replace(/[\]\['\s()]/g, '\\$&')} ${TimeArg}
+`;
+    } else {
+        return `mkdir ~/NewMusic/${artist}
 youtube-dl --extract-audio --audio-format mp3 --audio-quality 5 -o 'album.%(ext)s' ${link}
 mp3splt -o @a-@t -d ~/NewMusic/${artist} -g ${TitleArg} album.mp3 ${TimeArg}
 rm album.mp3
-`;
+`;}
 };

@@ -7,6 +7,8 @@ const fs = require('fs');
 const Album = require('./lib/getAlbum.js')();
 const albumJSONpath = './album.json';
 const collectionPath = '/media/raylex/data/DownloadFromYoutube/collection';
+const XLSX = require('xlsx');
+const wb = XLSX.readFile('YoutubeCollection.xlsx');
 
 let window, wintube  
 
@@ -74,8 +76,16 @@ ipcMain.on('request-link-title', (event, req) => {
    const url = wintube.getURL();
    const r = url.match(/v=(.*)$/);
    const link = r ? r[1] : '';
-   const linktitle = r ? wintube.getTitle() : '';
+   const linktitle = r ? wintube.getTitle().replace(/\s-\sYouTube$/,'') : '';
    event.reply('link-title-sent', {link: link, linktitle: linktitle});
+});
+
+ipcMain.on('request-time-title', (event, singer) => {
+   let timetitle = '';
+   if (wb.SheetNames.includes(singer)) {
+     timetitle = XLSX.utils.sheet_to_csv(wb.Sheets[singer]);
+   }
+   event.reply('time-title-sent', timetitle);
 });
 
 app.on('ready', function(){

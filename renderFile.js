@@ -1,4 +1,5 @@
 const { ipcMain } = require('electron');
+const fs = require('fs');
 
 const ipcRenderer = require('electron').ipcRenderer;
 
@@ -22,14 +23,27 @@ ipcRenderer.on('link-title-sent', function(event, arg) {
     }
 });
 
+ipcRenderer.on('time-title-sent', function(event, arg) {
+    if (arg) {
+      document.getElementById("timetitle").value = arg;
+    }  
+});
+
 function requestAlbum() {
     const link = document.getElementById("link").value;
     const r = link.match(/\?v=(.*)$/);
     ipcRenderer.send('request-album', r ? r[1] : '')
 }
 
+function requestTimeTitle() {
+    const singer = document.getElementById('singer').value;
+    if (singer) {
+        ipcRenderer.send('request-time-title', singer);
+    }    
+}
+
 function requestLinkTitle() {
-    ipcRenderer.send('request-link-title', "request link and title");
+    ipcRenderer.send('request-link-title', 'request link title')
 }
 
 function sendForm(event) {
