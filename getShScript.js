@@ -6,11 +6,16 @@ module.exports = arg => {
     const filename = album.linktitle
     const collectionPath = '/media/raylex/data/DownloadFromYoutube/collection';
     const pattern = new RegExp(album.regex);
+    const hasTime = /\\d/.test(album.regex);
     const TimeTitles = album.timetitles.map(timetitle => {
         const rArray = pattern.exec(timetitle);
         const r = rArray ? rArray : [];
         let Time, Title;
         r[1] = r[1] ? r[1] : '0';
+        if (!hasTime) {
+            // No timestamp of the songs : This means mp3splt -s works perfect for this album:)
+            return {Time: '', Title: r[1].replace(/[\]\['\s()]/g, '\\$&')};
+        }
         r[2] = r[2] ? r[2] : '0';
         if (/^\d/.test(r[1])) {
             Title = r[r.length-1];
@@ -34,14 +39,14 @@ module.exports = arg => {
     const TimeArg = `${Times.join(" ")} EOF`;
     const TitleArg = Titles.join('');
     const AlbumCollectionPath = `${collectionPath}/${filename}.mp3`;
-    if (fs.existsSync(AlbumCollectionPath)) {
-        return `mkdir ~/NewMusic/${artist}
-mp3splt -o @a-@t -d ~/NewMusic/${artist} -g ${TitleArg} ${AlbumCollectionPath.replace(/[\]\['\s()]/g, '\\$&')} ${TimeArg}
-`;
-    } else {
-        return `mkdir ~/NewMusic/${artist}
-youtube-dl --extract-audio --audio-format mp3 --audio-quality 5 -o 'album.%(ext)s' ${link}
-mp3splt -o @a-@t -d ~/NewMusic/${artist} -g ${TitleArg} album.mp3 ${TimeArg}
-rm album.mp3
-`;}
-};
+    const mkdirLine = `mkdir ~/NewMusic/${artist}`;
+    const dlmp3Line = `youtube-dl --extract-audio --audio-format mp3 --audio-quality 5 -o 'album.%(ext)s' ${link}`;
+    const hasMp3 = fs.existsSync(AlbumCollectionPath);
+    const albumFile = hasMp3 ? `${AlbumCollectionPath.replace(/[\]\['\s()]/g, '\\$&')}`: 'album.mp3';
+    const spltLine = hasTime 
+      ? `mp3splt -o @a-@t -d ~/NewMusic/${artist} -g ${TitleArg} ${albumFile} ${TimeArg}`
+      : `mp3splt -s -o @a-@t -d ~/NewMusic/${artist} -g ${TitleArg} ${albumFile}`;
+    return hasMp3 
+      ? `${mkdirLine}\n${spltLine}\n`
+      : `${mkdirLine}\n${dlmp3Line}\n${spltLine}\nrm album.mp3\n`;  
+}

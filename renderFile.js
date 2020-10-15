@@ -3,6 +3,10 @@ const fs = require('fs');
 
 const ipcRenderer = require('electron').ipcRenderer;
 
+const collectionPath = '/media/raylex/data/DownloadFromYoutube/collection';
+const files = fs.readdirSync(collectionPath).map(e => e.replace(/^(.*)\.mp3/,'$1')).join('\n');
+document.getElementById('olddata').value = files; 
+
 ipcRenderer.on('album-sent', function(event, arg) {
     const link = arg.link;
     const album = arg.albumObj;
