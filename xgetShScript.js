@@ -1,3 +1,4 @@
+const XRegExp = require('xregexp');
 const { fstat } = require("fs");
 
 module.exports = arg => {
@@ -7,37 +8,30 @@ module.exports = arg => {
     const collectionPath = '/media/raylex/data/DownloadFromYoutube/collection';
     const bashEscapePattern = /[\]\['&!?,\s()]/g;
     const escapePattern = bashEscapePattern;
-    const pattern = new RegExp(album.regex);
-    const hasTime = /\\d/.test(album.regex);
+    const pattern = XRegExp(album.regex, 'x');
+    const hasTime = /\(\?<m>/.test(album.regex);
+    const hasHour = /\(\?<h>/.test(album.regex);
+    const hasArtist = /\(\?<a>/.test(album.regex);
+    const hasYear = /\(\?<y>/.test(album.regex);
     const TimeTitles = album.timetitles.map(timetitle => {
-        const rArray = pattern.exec(timetitle);
-        const r = rArray ? rArray : [];
-        let Time, Title;
-        r[1] = r[1] ? r[1] : '0';
-        if (!hasTime) {
-            // No timestamp of the songs : This means mp3splt -s works perfect for this album:)
-            return {Time: '', Title: r[1].replace(escapePattern, '\\$&')};
-        }
-        r[2] = r[2] ? r[2] : '0';
-        if (/^\d/.test(r[1])) {
-            Title = r[r.length-1];
-            Time = (r.length === 5) 
-                ? `${60*(r[1].replace(/:$/,'')) + 1*r[2]}.${r[3]}`
-                : `${r[1]}.${r[2]}`;
-        } else {
-            Title = r[1];
-            Time = (r.length === 5) 
-                ? `${60*(r[2].replace(/:$/,'')) + 1*r[3]}.${r[4]}`
-                : `${r[2]}.${r[3]}`;
-        }
-        TitleStr = Title ? Title : '';
-        return {Time: Time, Title: TitleStr.replace(escapePattern, '\\$&')};
+        const r = XRegExp.exec(timetitle, pattern);
+        const hour = hasHour ? r.h.replace(/:$/,'') : '0';
+        const Time = hasTime ? `${60*hour + 1*r.m}.${r.s}` : '';
+        const Title = r.t.replace(escapePattern, '\\$&');
+        const Artist = hasArtist ? r.a.replace(escapePattern, '\\$&') : '';
+        const Year = hasYear ? r.y : '';
+        return {Time: Time, Title: Title, Artist: Artist, Year: Year};
     });
     const Times = TimeTitles.map(e => e.Time);
     const artist = album.singer.replace(escapePattern, '\\$&');
     const alBum = album.album.replace(escapePattern, '\\$&');
-    const Titles = TimeTitles.map( (e, idx) => 
-        (idx === 0 )  ? `%[@a=${artist},@b=${alBum},@t=${e.Title},@g=13]` : `[@t=${e.Title}]`);
+    const Titles = TimeTitles.map( (e, idx) => { 
+        let TitleStr = (idx === 0 )  ? `@b=${alBum},@t=${e.Title},@g=13` : `@t=${e.Title}`;
+        TitleStr = hasYear ? `${TitleStr},@y=${e.Year}` : TitleStr;
+        TitleStr = hasArtist ? `${TitleStr},@a=${e.Artist}` 
+                             : ((idx === 0) ? `${TitleStr},@a=${artist}` : TitleStr);
+        return (idx === 0) ? `%[${TitleStr}]` : `[${TitleStr}]`;                     
+    }); 
     const TimeArg = `${Times.join(" ")} EOF`;
     const TitleArg = Titles.join('');
     const AlbumCollectionPath = `${collectionPath}/${filename}.mp3`;

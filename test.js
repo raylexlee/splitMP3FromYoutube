@@ -1,8 +1,8 @@
 const { link } = require('fs');
 
 const Album = require('./lib/getAlbum.js')();
-for (const link in Album) {
-    arg = {link: link, albumObj: Album[link]};
-    const shstr = require('./getShScript.js')(arg);
-    console.log(shstr);
-} 
+// const linkrax = 'MAktNj5Eh8o';
+const linkrax = 'tjj4zBeMfTc';
+arg = {link: linkrax, albumObj: Album[linkrax]};
+const shstr = require('./xgetShScript.js')(arg);
+console.log(shstr);

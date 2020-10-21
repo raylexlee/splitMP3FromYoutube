@@ -66,11 +66,11 @@ ipcMain.on('form-submission', function (event, arg) {
 });
 
 ipcMain.on('request-album', (event, link) => {
-  event.reply('album-sent', 
-    ( link && (link in Album) ) 
+  const arg = ( link && (link in Album) ) 
       ? {link: link, albumObj: Album[link]} 
-      : {link: link, albumObj: {}})
-    });
+      : {link: link, albumObj: {}};
+  event.reply('album-sent', arg)
+});
 
 ipcMain.on('request-link-title', (event, req) => {
    const url = wintube.getURL();
