@@ -16,7 +16,8 @@ ipcRenderer.on('album-sent', function(event, arg) {
     document.getElementById("singer").value = album.singer;
     document.getElementById("regex").value = album.regex;
     document.getElementById("timetitle").value = album.timetitles.join("\n");
-    document.getElementById("bashscript").value = require('./xgetShScript')(arg);
+    const GetShScriptPath = /\(\?<t>/.test(album.regex) ? './xgetShScript' : './getShScript';
+    document.getElementById("bashscript").value = require(GetShScriptPath)(arg);
 });
 
 ipcRenderer.on('link-title-sent', function(event, arg) {
