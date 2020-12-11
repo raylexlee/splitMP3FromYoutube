@@ -14,10 +14,10 @@
   "author": "Raylex Lee",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^8.5.3"
+    "electron": "^8.5.5"
   },
   "dependencies": {
-    "xlsx": "^0.16.8",
-    "xregexp": "^4.4.0"
+    "xlsx": "^0.16.9",
+    "xregexp": "^4.4.1"
   }
 }
