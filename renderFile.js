@@ -20,6 +20,12 @@ ipcRenderer.on('album-sent', function(event, arg) {
     document.getElementById("bashscript").value = require(GetShScriptPath)(arg);
 });
 
+ipcRenderer.on('regex-sent', function(event, arg) {
+    if (arg) {
+        document.getElementById('oldregex').value = arg;
+    }
+});
+
 ipcRenderer.on('link-title-sent', function(event, arg) {
     const link = arg.link;
     if (link) {
@@ -49,6 +55,10 @@ function requestTimeTitle() {
 
 function requestLinkTitle() {
     ipcRenderer.send('request-link-title', 'request link title')
+}
+
+function requestRegex() {
+    ipcRenderer.send('request-past-regex', 'request pastregex')
 }
 
 function sendForm(event) {

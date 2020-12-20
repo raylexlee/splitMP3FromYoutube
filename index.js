@@ -72,6 +72,11 @@ ipcMain.on('request-album', (event, link) => {
   event.reply('album-sent', arg)
 });
 
+ipcMain.on('request-past-regex', (event, req) => {
+  const arg = Object.keys(Album).map(videoId => Album[videoId].regex).join('\n');
+  event.reply('regex-sent', arg);
+});
+
 ipcMain.on('request-link-title', (event, req) => {
    const url = wintube.getURL();
    const r = url.match(/v=(.*)$/);
